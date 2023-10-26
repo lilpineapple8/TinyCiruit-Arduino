@@ -21,6 +21,7 @@
 #include <SPI.h>
 #include <TinyScreen.h>
 
+
 //Library must be passed the board type
 //TinyScreenDefault for TinyScreen shields
 //TinyScreenAlternate for alternate address TinyScreen shields
@@ -70,7 +71,7 @@ void loop() {
     display.clearScreen();
     SerialMonitorInterface.print(ble_rx_buffer_len);
     SerialMonitorInterface.print(" : ");
-    SerialMonitorInterface.println((char*)ble_rx_buffer);
+    SerialMonitorInterface.println((char*)ble_rx_buffer); //input from phone
 
     //display on tinyscreen
     display.setCursor(0,0);
@@ -117,5 +118,35 @@ void loop() {
       SerialMonitorInterface.println(F("TX dropped!"));
     }
   }
+displayLoop();
 }
+bool lastButtonState = false; // Initialize to a default state
 
+void displayLoop() {
+  bool currentButtonState = display.getButtons(TSButtonUpperLeft) || display.getButtons(TSButtonLowerLeft);
+    display.setCursor(0, 0);
+    display.println("Yes");
+    display.setCursor(0, 54);
+    display.println("No");
+  if (currentButtonState != lastButtonState) {
+
+    if (currentButtonState) {
+      // A button is pressed, display "Yes" or "No" accordingly
+      display.setCursor(0, 0);
+      display.println("Yes");
+      display.setCursor(0, 54);
+      display.println("No");
+
+      if (display.getButtons(TSButtonUpperLeft)) {
+        SerialMonitorInterface.print("Yes");
+      } else {
+        SerialMonitorInterface.print("No");
+      }
+    }
+
+    lastButtonState = currentButtonState;
+  }
+
+  // Additional code for other parts of your displayLoop if needed
+  // display.setCursor(95 - display.getPrintWidth("Pressed!"), 0);
+}
